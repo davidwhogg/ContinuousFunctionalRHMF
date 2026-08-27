@@ -115,6 +115,14 @@ HOGG: Orthogonality and ordering using SVD, perhaps?
 
 HOGG: What does non-negativity look like? Is it even possible here?
 
+\paragraph{Counting arguments:}
+For the problem to be even identifiable, we need
+\begin{align}
+    N &> \max(K\,L, K\,M) \\
+    K &< \max(L, M) ~.
+\end{align}
+If we want the result to be stable we probably want the ``$N>$'' to become ``$N\gg$'' and the ``$K<$'' to become ``$K\ll$.''
+
 \paragraph{Method:}
 If we expand out the full model we get
 \begin{align}
@@ -126,7 +134,7 @@ Note that if you freeze the $\gamma_{km}$ coefficients, this model is linear in 
 If you freeze the $\alpha_{k\ell}$ coefficients, this model is linear in the $\gamma_{km}$ coefficients.
 Thus this model can be optimized with iterated schedules of $\alpha_{k\ell}$ and $\gamma_{km}$ optimization steps.
 
-The optimiezation proceeds by a schedule of four kinds of steps.
+The optimization proceeds by a schedule of four kinds of steps.
 In the \emph{alpha step} we fix all the $\gamma_{km}$ coefficients and the data weights $w_j$ and perform weighted least squares to obtain the best-fit $\alpha_{k\ell}$. This looks like
 \begin{align}
     A &\leftarrow [X_\alpha^\top\,W\,X_\alpha]^{-1}\,X_\alpha^\top\,W\,Y ~,
