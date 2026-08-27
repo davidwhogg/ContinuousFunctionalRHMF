@@ -92,22 +92,65 @@ In full generality, we seek $K$ functions $a_k(x)$ and $K$ functions $g_k(\lambd
 \end{align}
 such that a loss function acting on the residuals $s_j$ and weights $w_j$ is minimized, perhaps also subject to additional constraints such as orthogonality or non-negativity.
 
-Now how to learn continuous functions?
-Choose a basis and learn basis coefficients, probably.
-So this will look something like
+\paragraph{Choice of bases:}
+We want to learn continuous functions; the standard approach is to choose a basis and learn basis coefficients.
+This looks like
 \begin{align}
-    a_k(x) &= \sum_\ell \alpha_{k\ell}\,B_\ell(x) \\
-    g_k(\lambda) &= \sum_m \gamma_{km}\,H_m(\lambda) ~,
+    a_k(x) &= \sum_{\ell=1}^L \alpha_{k\ell}\,B_\ell(x) \\
+    g_k(\lambda) &= \sum_{m=1}^M \gamma_{km}\,H_m(\lambda) ~,
 \end{align}
 where the $B_\ell()$ comprise a sensible, generic basis of spatial functions,
 and the $H_m()$ comprise a sensible basis of wavelength functions.
-Once we choose our bases, our loss function, and our constraints, all we need do is optimize.
 
-\paragraph{Choice of bases:}
+Here we are going to choose Fourier bases for everything.
+Why? Because ... HOGG
+
+Another sensible choice would be a wavelet basis; indeed such bases could lead to very sparse matrices in what follows, and thus be faster in many applications.
+Currently we just don't have wavelet technology that is as sophisticated as our Fourier technology.
 
 \paragraph{Loss functions for robustness:}
 
+\paragraph{Constraints:}
+HOGG: Orthogonality and ordering using SVD, perhaps?
+
+HOGG: What does non-negativity look like? Is it even possible here?
+
 \paragraph{Method:}
+If we expand out the full model we get
+\begin{align}
+    y_j &= \sum_{k=1}^K \sum_{\ell=1}^L \sum_{m=1}^M \alpha_{k\ell}\,\gamma_{km}\,X_{\ell mj} + s_j \\
+    X_{\ell mj} &\equiv B_\ell(x_j)\,H_m(\lambda_j) ~,
+\end{align}
+where $X_{\ell mj}$ is like a three-index design tensor; it is the evaluation of all the basis functions at all the data.
+Note that if you freeze the $\gamma_{km}$ coefficients, this model is linear in the $\alpha_{k\ell}$ coefficients.
+If you freeze the $\alpha_{k\ell}$ coefficients, this model is linear in the $\gamma_{km}$ coefficients.
+Thus this model can be optimized with iterated schedules of $\alpha_{k\ell}$ and $\gamma_{km}$ optimization steps.
+
+The optimiezation proceeds by a schedule of four kinds of steps.
+In the \emph{alpha step} we fix all the $\gamma_{km}$ coefficients and the data weights $w_j$ and perform weighted least squares to obtain the best-fit $\alpha_{k\ell}$. This looks like
+\begin{align}
+    A &\leftarrow [X_\alpha^\top\,W\,X_\alpha]^{-1}\,X_\alpha^\top\,W\,Y ~,
+\end{align}
+where $A$ is a flat $K\,L\times 1$ column vector of the $\alpha_{k\ell}$ coefficients,
+$X_\alpha$ is a rectangular $N\times K\,L$ design matrix made up of sums (over $m$) of $\gamma_{km}\,X_{\ell mj}$,
+$W$ is a diagonal $N\times N$ matrix of weights $w_j$,
+and $Y$ is a flat $N\times 1$ column vector of the data $y_j$.
+
+In the \emph{gamma step} we fix all the $\alpha_{k\ell}$ coefficients and the data weights $w_j$ and perform weighted least squares to obtain the best-fit $\gamma_{km}$. This looks like
+\begin{align}
+    \Gamma &\leftarrow [X_\gamma^\top\,W\,X_\gamma]^{-1}\,X_\gamma^\top\,W\,Y ~,
+\end{align}
+where $\Gamma$ is a flat $K\,M\times 1$ column vector of the $\gamma_{km}$ coefficients,
+and $X_\gamma$ is a rectangular $N\times K\,M$ design matrix made up of sums (over $\ell$) of $\alpha_{k\ell}\,X_{\ell mj}$.
+
+In the \emph{w step} we fix all the $\alpha_{k\ell}$ and $\gamma_{km}$ coefficients and update the weights according to the standard iteratively reweighted least squares (IRLS \cite{irls}) formula:
+\begin{align}
+    w_j &\leftarrow \text{HOGG WHAT NOW?} ~,
+\end{align}
+where $w_j^\text{(orig)}$ are the original input (presumed reasonably estimated) measurement inverse variance weights,
+and $Q$ is a free parameter related to the objective function HOGG HOW?
+
+Finally, in the \emph{orthogonalization step} we perform an SVD to HOGG DO WHAT AND HOW?
 
 \bibliographystyle{plain}
 \bibliography{ragged}
